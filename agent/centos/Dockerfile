@@ -17,7 +17,9 @@ RUN yum --quiet makecache && \
             openssl-devel \
             openldap-devel \
             subversion \
-            gcc && \
+            gcc \
+            git \
+            pcre-devel && \
     cd /tmp/ && \
     svn --quiet export ${ZBX_SOURCES} zabbix-${ZBX_VERSION} && \
     cd /tmp/zabbix-${ZBX_VERSION} && \
@@ -37,6 +39,15 @@ RUN yum --quiet makecache && \
             --enable-ipv6 \
             --silent && \
     make -j"$(nproc)" -s
+
+    WORKDIR /root
+
+RUN git clone -q https://github.com/monitoringartist/zabbix-docker-monitoring
+
+RUN cd /tmp/zabbix-${ZBX_VERSION} && \
+   cp -R ~/zabbix-docker-monitoring/src/modules/zabbix_module_docker/ /tmp/zabbix-${ZBX_VERSION}/src/modules/ && \
+   cd /tmp/zabbix-${ZBX_VERSION}/src/modules/zabbix_module_docker && \
+   make
 
 FROM centos:centos7
 LABEL maintainer="Alexey Pustovalov <alexey.pustovalov@zabbix.com>"
@@ -73,6 +84,8 @@ COPY --from=builder /tmp/zabbix-${ZBX_VERSION}/src/zabbix_agent/zabbix_agentd /u
 COPY --from=builder /tmp/zabbix-${ZBX_VERSION}/src/zabbix_get/zabbix_get /usr/bin/zabbix_get
 COPY --from=builder /tmp/zabbix-${ZBX_VERSION}/src/zabbix_sender/zabbix_sender /usr/bin/zabbix_sender
 COPY --from=builder  /tmp/zabbix-${ZBX_VERSION}/conf/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf
+COPY --from=builder  /tmp/zabbix-${ZBX_VERSION}/src/modules/zabbix_module_docker/zabbix_module_docker.so /var/lib/zabbix/modules/
+COPY module_docker.conf /etc/zabbix/zabbix_agentd.d/docker
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /sbin/tini
 
 RUN groupadd --system zabbix && \
