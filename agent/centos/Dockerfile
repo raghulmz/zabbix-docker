@@ -50,7 +50,7 @@ RUN cd /tmp/zabbix-${ZBX_VERSION} && \
    make
 
 FROM centos:centos7
-LABEL maintainer="Alexey Pustovalov <alexey.pustovalov@zabbix.com>"
+LABEL maintainer="raghulmz <raghulmz@gmail.com>"
 
 ARG BUILD_DATE
 ARG VCS_REF
