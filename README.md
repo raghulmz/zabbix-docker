@@ -1,5 +1,7 @@
 ![logo](https://assets.zabbix.com/img/logo/zabbix_logo_500x131.png)
 
+[![Build Status](https://cloud.drone.io/api/badges/raghulmz/zabbix-docker/status.svg)](https://cloud.drone.io/raghulmz/zabbix-docker)
+
 # What is Zabbix?
 
 Zabbix is an enterprise-class open source distributed monitoring solution.
